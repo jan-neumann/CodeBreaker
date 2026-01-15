@@ -22,13 +22,16 @@ struct ContentView: View {
     
     func pegs(_ colors: Array<Color>) -> some View {
         HStack {
-            Circle().foregroundStyle(colors[0])
-            Circle().foregroundStyle(colors[1])
-            Circle().foregroundStyle(colors[2])
-            Circle().foregroundStyle(colors[3])
+            ForEach(colors.indices, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 10)
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(colors[index])
+            }
+            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
         }
     }
 }
+
 
 #Preview {
     ContentView()
