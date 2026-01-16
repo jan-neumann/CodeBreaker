@@ -36,14 +36,19 @@ struct MatchMarkers: View {
     }
     
     func matchMarker(peg: Int) -> some View {
-        let exactCount: Int = matches.count(where: { $0 == .exact })
-        let foundCount: Int = matches.count(where: { $0 != .nomatch })
+        let exactCount = matches.count { $0 == .exact }
+        let foundCount = matches.count { $0 != .nomatch }
         
         return Circle()
             .fill(exactCount > peg ? Color.primary : Color.clear)
             .strokeBorder(foundCount > peg ? Color.primary : Color.clear, lineWidth: 2)
             .aspectRatio(1, contentMode: .fit)
     }
+    
+    func isExact(match: Match) -> Bool {
+        match == .exact
+    }
+  
 }
 
 #Preview {
