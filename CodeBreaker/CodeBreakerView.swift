@@ -8,27 +8,45 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    let game = CodeBreaker()
+    
+    @State var game = CodeBreaker()
     
     var body: some View {
         
         VStack {
-            pegs([.green, .blue, .yellow, .red])
-            pegs([.green, .red, .yellow, .red])
-            pegs([.green, .blue, .blue, .red])
+            view(for: game.masterCode)
+            
+            ScrollView {
+                view(for: game.guess)
+                Divider()
+                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
+                    view(for: game.attempts[index])
+                }
+            }
+            Button("Guess") {
+                withAnimation {
+                    game.attemptGuess()
+                }
+            }
+          
         }
         .padding()
         
     }
     
-    func pegs(_ colors: Array<Color>) -> some View {
+    func view(for code: Code) -> some View {
         HStack {
-            ForEach(colors.indices, id: \.self) { index in
+            ForEach(code.pegs.indices, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 10)
                     .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(colors[index])
+                    .foregroundStyle(code.pegs[index])
+                    .onTapGesture {
+                        if code.kind == .guess {
+                            game.changeGuessPeg(at: index)
+                        }
+                    }
             }
-            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+            MatchMarkers(matches: code.match(against: game.masterCode))
         }
     }
 }
