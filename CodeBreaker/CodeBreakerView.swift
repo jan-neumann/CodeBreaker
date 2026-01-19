@@ -9,35 +9,50 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
-    @State var game = CodeBreaker()
+    @State var game = CodeBreaker(
+        pegChoices: [.red, .green, .blue, .yellow])
     
     var body: some View {
         
         VStack {
             view(for: game.masterCode)
+            view(for: game.guess)
             
             ScrollView {
-                view(for: game.guess)
+               
                 Divider()
                 ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                     view(for: game.attempts[index])
                 }
             }
-            Button("Guess") {
-                withAnimation {
-                    game.attemptGuess()
-                }
-            }
+           
           
         }
         .padding()
         
     }
     
+    var guessButton: some View {
+        Button("Guess") {
+            withAnimation {
+                game.attemptGuess()
+            }
+        }
+        .font(.system(size: 80))
+        .minimumScaleFactor(0.1)
+    }
+    
     func view(for code: Code) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 10)
+                    .overlay {
+                        if code.pegs[index] == Code.missing {
+                            RoundedRectangle(cornerRadius: 10)
+                                .strokeBorder(Color.gray)
+                        }
+                    }
+                    .contentShape(Rectangle())
                     .aspectRatio(contentMode: .fit)
                     .foregroundStyle(code.pegs[index])
                     .onTapGesture {
@@ -46,7 +61,12 @@ struct CodeBreakerView: View {
                         }
                     }
             }
-            MatchMarkers(matches: code.match(against: game.masterCode))
+            MatchMarkers(matches: code.matches)
+                .overlay {
+                    if code.kind == .guess {
+                        guessButton
+                    }
+                }
         }
     }
 }
