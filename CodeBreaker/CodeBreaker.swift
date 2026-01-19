@@ -23,6 +23,16 @@ struct CodeBreaker {
     }
     
     mutating func attemptGuess() {
+        
+        // Make sure that all pegs got a color
+        guard guess.pegs.firstIndex(of: Code.missing) == nil else {
+            return
+        }
+        // Make sure that attempts which were tried before, are ignored
+        guard !attempts.contains(where: { $0.pegs == guess.pegs }) else {
+            return
+        }
+        
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
@@ -55,7 +65,7 @@ struct Code {
     }
     
     mutating func randomize(from pegChoices: [Peg]) {
-        for index in pegChoices.indices {
+        for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Code.missing
         }
     }
@@ -89,3 +99,4 @@ struct Code {
         return results
     }
 }
+
