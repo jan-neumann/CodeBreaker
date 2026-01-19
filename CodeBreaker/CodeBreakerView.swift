@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
+
     @State var game = CodeBreaker(
         pegChoices: [.red, .green, .blue, .yellow])
     
@@ -26,10 +27,19 @@ struct CodeBreakerView: View {
                 }
             }
            
-          
+            restartButton
         }
         .padding()
         
+    }
+    
+    var restartButton: some View {
+        Button("Restart") {
+            withAnimation {
+                game = CodeBreaker(pegChoices: [.red, .green, .blue, .yellow])
+            }
+        }
+        .font(.largeTitle)
     }
     
     var guessButton: some View {
