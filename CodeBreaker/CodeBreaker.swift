@@ -7,17 +7,32 @@
 
 import SwiftUI
 
-typealias Peg = Color
-
-struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
-    var guess: Code = Code(kind: .guess)
-    var attempts: [Code] = []
-    let pegChoices: [Peg]
+struct Peg<T: Hashable>: Equatable {
+    static func == (lhs: Peg<T>, rhs: Peg<T>) -> Bool {
+        lhs.value == rhs.value
+    }
     
-    init(pegChoices: [Peg] = [.red, .green, .blue, .yellow]) {
+    var value: T
+    
+    init(_ value: T) {
+        self.value = value
+    }
+}
+
+
+struct CodeBreaker<T: Hashable> {
+    var masterCode: Code<T>
+    var guess: Code<T>
+    var attempts: [Code<T>] = []
+    let pegChoices: [Peg<T>]
+    let missing: Peg<T>
+    
+    init(pegChoices: [Peg<T>] = [.init(Color.red), .init(Color.green), .init(Color.blue), .init(Color.yellow)], missing: Peg<T> = .init(Color.clear), count: Int) {
+        self.masterCode = Code(kind: .master, missing: missing, count: count)
+        self.guess = Code(kind: .guess, missing: missing, count: count)
         self.pegChoices = pegChoices
         self.masterCode.randomize(from: pegChoices)
+        self.missing = missing
         
         print(masterCode)
     }
@@ -25,7 +40,7 @@ struct CodeBreaker {
     mutating func attemptGuess() {
         
         // Make sure that all pegs got a color
-        guard guess.pegs.firstIndex(of: Code.missing) == nil else {
+        guard guess.pegs.firstIndex(of: missing) == nil else {
             return
         }
         // Make sure that attempts which were tried before, are ignored
@@ -45,17 +60,14 @@ struct CodeBreaker {
             let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
             guess.pegs[index] = newPeg
         } else {
-            guess.pegs[index] = pegChoices.first ?? Code.missing
+            guess.pegs[index] = pegChoices.first ?? missing
         }
     }
 }
 
 
-struct Code {
-    var kind: Kind
-    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
+struct Code<T: Hashable> {
     
-    static let missing: Peg = .clear
     
     enum Kind: Equatable {
         case master
@@ -64,9 +76,19 @@ struct Code {
         case unknown
     }
     
-    mutating func randomize(from pegChoices: [Peg]) {
+    var kind: Kind
+    var pegs: [Peg<T>]
+    var missing: Peg<T>
+    
+    init(kind: Kind, missing: Peg<T>, count: Int) {
+        self.kind = kind
+        self.pegs = Array(repeating: missing, count: count)
+        self.missing = missing
+    }
+
+    mutating func randomize(from pegChoices: [Peg<T>]) {
         for index in pegs.indices {
-            pegs[index] = pegChoices.randomElement() ?? Code.missing
+            pegs[index] = pegChoices.randomElement() ?? missing
         }
     }
     

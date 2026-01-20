@@ -7,36 +7,60 @@
 
 import SwiftUI
 
-struct CodeBreakerView: View {
+struct CodeBreakerView<T: Hashable>: View {
     
-
-    @State var game = CodeBreaker(
-        pegChoices: [.red, .green, .blue, .yellow])
+//    @State var game = CodeBreaker<Color>(
+//        pegChoices: [.init(Color.red), .init(Color.green), .init(Color.blue), .init(Color.yellow)],
+//        missing: .init(Color.clear),
+//        count: Int.random(in: 3...6)
+//    )
+    let pegChoices: [Peg<T>]
+    let missing: Peg<T>
+    @State var game: CodeBreaker<T>?
+    
+    func resetGame() {
+        game = CodeBreaker<T>(
+            pegChoices: pegChoices,
+            missing: missing,
+            count: Int.random(in: 3...6)
+        )
+    }
     
     var body: some View {
         
+      
         VStack {
-            view(for: game.masterCode)
-            view(for: game.guess)
-            
-            ScrollView {
-               
-                Divider()
-                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    view(for: game.attempts[index])
+            if let game = game {
+                view(for: game.masterCode)
+                view(for: game.guess)
+                
+                ScrollView {
+                    
+                    Divider()
+                    ForEach(game.attempts.indices.reversed(), id: \.self) { index in
+                        view(for: game.attempts[index])
+                    }
                 }
+                
+                restartButton
             }
-           
-            restartButton
         }
         .padding()
+        .onAppear {
+            resetGame()
+        }
         
     }
     
     var restartButton: some View {
         Button("Restart") {
             withAnimation {
-                game = CodeBreaker(pegChoices: [.red, .green, .blue, .yellow])
+//                game = CodeBreaker<Color>(
+//                    pegChoices: [.init(Color.red), .init(Color.green), .init(Color.blue), .init(Color.yellow)],
+//                    missing: .init(Color.clear),
+//                    count: Int.random(in: 3...6)
+//                )
+                resetGame()
             }
         }
         .font(.largeTitle)
@@ -44,30 +68,34 @@ struct CodeBreakerView: View {
     
     var guessButton: some View {
         Button("Guess") {
+            guard game != nil else { return }
             withAnimation {
-                game.attemptGuess()
+               game!.attemptGuess()
             }
         }
         .font(.system(size: 80))
         .minimumScaleFactor(0.1)
     }
     
-    func view(for code: Code) -> some View {
+    func view(for code: Code<T>) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 RoundedRectangle(cornerRadius: 10)
                     .overlay {
-                        if code.pegs[index] == Code.missing {
+                        if code.pegs[index] == code.missing {
                             RoundedRectangle(cornerRadius: 10)
                                 .strokeBorder(Color.gray)
                         }
                     }
                     .contentShape(Rectangle())
                     .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(code.pegs[index])
+                    .foregroundStyle(T.self == Color.self ? code.pegs[index].value as! Color : Color.clear)
+                    .overlay(T.self == String.self ? Text("\(code.pegs[index].value as! String)")
+                        .font(.largeTitle) :
+                                Text(""))
                     .onTapGesture {
-                        if code.kind == .guess {
-                            game.changeGuessPeg(at: index)
+                        if code.kind == .guess, game != nil {
+                            game!.changeGuessPeg(at: index)
                         }
                     }
             }
@@ -83,5 +111,5 @@ struct CodeBreakerView: View {
 
 
 #Preview {
-    CodeBreakerView()
+    CodeBreakerView<String>(pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")], missing: .init(" "))
 }
