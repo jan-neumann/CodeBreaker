@@ -66,9 +66,8 @@ struct GameView<T: Hashable>: View {
                     }
                     .contentShape(Rectangle())
                     .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(T.self == Color.self ? code.pegs[index].value as! Color : Color.clear)
-                    .overlay(T.self == String.self ?  Text("\(code.pegs[index].value as! String)") : Text("")
-                    )
+                    .foregroundStyle(foregroundColor(for: code.pegs[index].value))
+                    .overlay(overlayText(for: code.pegs[index].value))
                     .font(.system(size: 80))
                     .minimumScaleFactor(0.1)
                     .onTapGesture {
@@ -85,6 +84,15 @@ struct GameView<T: Hashable>: View {
                 }
         }
     }
+    
+    func overlayText(for value: T) -> some View {
+       Text(value as? String ?? "")
+    }
+    
+    func foregroundColor(for value: T) -> Color {
+        value as? Color ?? Color.clear
+    }
+    
 }
 
 #Preview {
