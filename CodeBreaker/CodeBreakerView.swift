@@ -9,8 +9,29 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
+    let emojiPegs: [Peg<String>] = [
+        .init("🐱"),
+        .init("🐹"),
+        .init("🐯"),
+        .init("🐸"),
+        .init("🐻‍❄️"),
+        .init("🦁")
+    ]
+    let emojiMissing: Peg<String> = .init("")
+    
+    let colorPegs: [Peg<Color>] = [
+        .init(Color.blue),
+        .init(.red),
+        .init(.yellow),
+        .init(.green),
+        .init(.pink),
+        .init(.purple)
+    ]
+    let colorMissing: Peg<Color> = .init(.clear)
+    
     @State private var emojiView: Bool = false
     @State private var restartGame: Bool = false
+    
     
     var body: some View {
         
@@ -18,13 +39,13 @@ struct CodeBreakerView: View {
             VStack {
                 if emojiView {
                     GameView<String>(
-                        pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")],
-                        missing: .init(""),
+                        pegChoices: emojiPegs,
+                        missing: emojiMissing,
                     )
                 } else {
                     GameView<Color>(
-                        pegChoices: [.init(.blue), .init(.red), .init(.yellow), .init(.green)],
-                        missing: .init(.clear)
+                        pegChoices: colorPegs,
+                        missing: colorMissing
                     )
                 }
                 
