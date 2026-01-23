@@ -92,33 +92,36 @@ struct Code<T: Hashable> {
         }
     }
     
-    var matches: [Match] {
+    var matches: [Match]? {
         switch kind {
         case .attempt(let matches):
             return matches
         default:
-            return []
+            return nil
         }
     }
     
     func match(against otherCode: Code) -> [Match] {
-        var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
         var pegsToMatch = otherCode.pegs
-        for index in pegs.indices.reversed() {
-            if pegsToMatch.count > index, pegsToMatch[index] == pegs[index] {
-                results[index] = .exact
-                pegsToMatch.remove(at: index)
+        let reversedExactMatches = pegs.indices.reversed().map {
+            if pegsToMatch.count > $0, pegsToMatch[$0] == pegs[$0] {
+                pegsToMatch.remove(at: $0)
+                return Match.exact
+            } else {
+                return .nomatch
             }
         }
-        for index in pegs.indices {
-            if results[index] != .exact {
-                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
-                    results[index] = .inexact
+        
+        let exactMatches = Array(reversedExactMatches.reversed())
+        return pegs.indices.map {
+            if exactMatches[$0] != .exact, let matchIndex = pegsToMatch.firstIndex(of: pegs[$0]) {
                     pegsToMatch.remove(at: matchIndex)
-                }
+                    return .inexact
+            } else {
+                return exactMatches[$0]
             }
         }
-        return results
     }
+    
 }
 
