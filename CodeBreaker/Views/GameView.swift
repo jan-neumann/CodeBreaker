@@ -35,12 +35,17 @@ struct GameView<T: Hashable>: View {
                     }
                 }
             }
+            pegChooser
         }
         .padding()
         .onAppear {
             resetGame()
         }
         
+    }
+    
+    var pegChooser: some View {
+        return EmptyView()
     }
     
     var guessButton: some View {
@@ -57,19 +62,7 @@ struct GameView<T: Hashable>: View {
     func view(for code: Code<T>) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 10)
-                    .overlay {
-                        if code.pegs[index] == code.missing {
-                            RoundedRectangle(cornerRadius: 10)
-                                .strokeBorder(Color.gray)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(foregroundColor(for: code.pegs[index].value))
-                    .overlay(overlayText(for: code.pegs[index].value))
-                    .font(.system(size: 80))
-                    .minimumScaleFactor(0.1)
+                PegView(peg: code.pegs[index], missing: missing)
                     .onTapGesture {
                         if code.kind == .guess, game != nil {
                             game!.changeGuessPeg(at: index)
@@ -90,15 +83,6 @@ struct GameView<T: Hashable>: View {
             
         }
     }
-    
-    func overlayText(for value: T) -> some View {
-       Text(value as? String ?? "")
-    }
-    
-    func foregroundColor(for value: T) -> Color {
-        value as? Color ?? Color.clear
-    }
-    
 }
 
 #Preview {

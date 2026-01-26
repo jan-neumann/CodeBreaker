@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    
+    // MARK: - Constants
     let emojiPegs: [Peg<String>] = [
         .init("🐱"),
         .init("🐹"),
@@ -24,15 +24,16 @@ struct CodeBreakerView: View {
         .init(.red),
         .init(.yellow),
         .init(.green),
-        .init(.pink),
+        .init(.brown),
         .init(.purple)
     ]
     let colorMissing: Peg<Color> = .init(.clear)
     
+    // MARK: - Data Owned by View
     @State private var emojiView: Bool = false
     @State private var restartGame: Bool = false
     
-    
+    // MARK: - Body
     var body: some View {
         
         if !restartGame {
