@@ -8,7 +8,10 @@
 
 import SwiftUI
 
-struct Peg<T: Hashable>: Equatable {
+struct Peg<T: Hashable>: Equatable, Identifiable {
+    
+    var id: String
+    
     static func == (lhs: Peg<T>, rhs: Peg<T>) -> Bool {
         lhs.value == rhs.value
     }
@@ -17,5 +20,6 @@ struct Peg<T: Hashable>: Equatable {
     
     init(_ value: T) {
         self.value = value
+        self.id = UUID().uuidString
     }
 }
