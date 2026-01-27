@@ -36,7 +36,6 @@ struct GameView<T: Hashable>: View {
         .onAppear {
             resetGame()
         }
-        
     }
     
     @ViewBuilder
@@ -46,6 +45,7 @@ struct GameView<T: Hashable>: View {
                 ForEach(game.pegChoices) { peg in
                     Button {
                         self.game!.setGuessPeg(peg, at: selection)
+                        selection = (selection + 1) % game.masterCode.pegs.count
                     } label: {
                         PegView(peg: peg, missing: missing)
                     }
@@ -63,15 +63,15 @@ struct GameView<T: Hashable>: View {
                 game!.attemptGuess()
             }
         }
-        .font(.system(size: 80))
-        .minimumScaleFactor(0.1)
+        .font(.system(size: GuessButton.maximumFontSize))
+        .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
     func view(for code: Code<T>) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index], missing: missing)
-                    .padding(5)
+                    .padding(Selection.border)
                     .background(
                         selectionBackground(index: index, codeKind: code.kind)
                     )
@@ -99,8 +99,8 @@ struct GameView<T: Hashable>: View {
     @ViewBuilder
     func selectionBackground(index: Int, codeKind: Code<T>.Kind) -> some View {
         if selection == index, codeKind == .guess {
-            RoundedRectangle(cornerRadius: 10)
-                .foregroundStyle(Color.gray.opacity(0.3))
+            Selection.shape
+                .foregroundStyle(Selection.color)
         } else {
             EmptyView()
         }
@@ -114,6 +114,25 @@ struct GameView<T: Hashable>: View {
         )
     }
     
+}
+
+private struct GuessButton {
+    static let minimumFontSize: CGFloat = 8
+    static let maximumFontSize: CGFloat = 80
+    static let scaleFactor = minimumFontSize / maximumFontSize
+}
+
+private struct Selection {
+    static let border: CGFloat = 5
+    static let cornerRadius: CGFloat = 10
+    static let color: Color = .gray(0.85)
+    static let shape = RoundedRectangle(cornerRadius: cornerRadius)
+}
+
+extension Color {
+    static func gray(_ brightness: CGFloat) -> Color {
+        Color(hue: 148/360, saturation: 0, brightness: brightness)
+    }
 }
 
 #Preview {

@@ -25,7 +25,8 @@ struct CodeBreakerView: View {
         .init(.yellow),
         .init(.green),
         .init(.brown),
-        .init(.purple)
+        .init(.purple),
+        .init(.black)
     ]
     let colorMissing: Peg<Color> = .init(.clear)
     
