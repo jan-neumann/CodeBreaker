@@ -1,5 +1,5 @@
 //
-//  CodeBreakerView.swift
+//  CodeView.swift
 //  CodeBreaker
 //
 //  Created by Jan Neumann on 14.01.26.
@@ -7,18 +7,20 @@
 
 import SwiftUI
 
-struct GameView<T: Hashable>: View {
+struct CodeView<T: Hashable>: View {
     
-    // MARK: - Data owned by view
+    // MARK: - Data In
     let pegChoices: [Peg<T>]
     let missing: Peg<T>
-    @State private var game: CodeBreaker<T>?
+    
+    // MARK: - Data owned by View
+    @State private var game: CodeBreaker<T> = CodeBreaker<T>()
     @State private var selection: Int = 0
     
     // MARK: - Body
     var body: some View {
         VStack {
-            if let game = game {
+            
                 view(for: game.masterCode)
                 view(for: game.guess)
                 
@@ -29,8 +31,8 @@ struct GameView<T: Hashable>: View {
                         view(for: game.attempts[index])
                     }
                 }
-            }
-            pegChooser
+            
+            PegChooser(game: $game, missing: missing, selection: $selection)
         }
         .padding()
         .onAppear {
@@ -38,29 +40,12 @@ struct GameView<T: Hashable>: View {
         }
     }
     
-    @ViewBuilder
-    var pegChooser: some View {
-        if let game = game {
-            HStack {
-                ForEach(game.pegChoices) { peg in
-                    Button {
-                        self.game!.setGuessPeg(peg, at: selection)
-                        selection = (selection + 1) % game.masterCode.pegs.count
-                    } label: {
-                        PegView(peg: peg, missing: missing)
-                    }
-                }
-            }
-        } else {
-            EmptyView()
-        }
-    }
+    
     
     var guessButton: some View {
         Button("Guess") {
-            guard game != nil else { return }
             withAnimation {
-                game!.attemptGuess()
+                game.attemptGuess()
             }
         }
         .font(.system(size: GuessButton.maximumFontSize))
@@ -76,7 +61,7 @@ struct GameView<T: Hashable>: View {
                         selectionBackground(index: index, codeKind: code.kind)
                     )
                     .onTapGesture {
-                        if code.kind == .guess, game != nil {
+                        if code.kind == .guess {
                             selection = index
                         }
                     }
@@ -136,5 +121,5 @@ extension Color {
 }
 
 #Preview {
-    GameView<String>(pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")], missing: .init(" "))
+    CodeView<String>(pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")], missing: .init(" "))
 }

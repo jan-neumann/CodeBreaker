@@ -40,12 +40,12 @@ struct CodeBreakerView: View {
         if !restartGame {
             VStack {
                 if emojiView {
-                    GameView<String>(
+                    CodeView<String>(
                         pegChoices: emojiPegs,
                         missing: emojiMissing,
                     )
                 } else {
-                    GameView<Color>(
+                    CodeView<Color>(
                         pegChoices: colorPegs,
                         missing: colorMissing
                     )

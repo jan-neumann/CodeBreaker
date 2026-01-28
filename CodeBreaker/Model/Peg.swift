@@ -22,4 +22,9 @@ struct Peg<T: Hashable>: Equatable, Identifiable {
         self.value = value
         self.id = UUID().uuidString
     }
+    
+    init(defaultValue: @autoclosure () -> T) {
+        self.id = UUID().uuidString
+        self.value = defaultValue()
+    }
 }

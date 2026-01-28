@@ -19,21 +19,29 @@ struct Code<T: Hashable> {
     
     var kind: Kind
     var pegs: [Peg<T>]
-    var missing: Peg<T>
+    var missing: Peg<T>?
     
     init(kind: Kind, missing: Peg<T>, count: Int) {
         self.kind = kind
         self.pegs = Array(repeating: missing, count: count)
         self.missing = missing
     }
+    
+    init() {
+        self.kind = .unknown
+        self.pegs = []
+        self.missing = nil
+    }
 
     mutating func randomize(from pegChoices: [Peg<T>]) {
+        guard let missing = missing else { return }
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? missing
         }
     }
     
     mutating func reset() {
+        guard let missing = missing else { return }
         pegs = Array(repeating: missing, count: pegs.count)
     }
     
