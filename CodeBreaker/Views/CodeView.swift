@@ -20,19 +20,24 @@ struct CodeView<T: Hashable>: View {
     // MARK: - Body
     var body: some View {
         VStack {
+            view(for: game.masterCode)
             
-                view(for: game.masterCode)
+            if (!game.isOver) {
                 view(for: game.guess)
-                
-                ScrollView {
-                    Divider()
-                    ForEach(game.attempts.indices.reversed(),
-                            id: \.self) { index in
-                        view(for: game.attempts[index])
-                    }
-                }
+            }
             
-            PegChooser(game: $game, missing: missing, selection: $selection)
+            ScrollView {
+                Divider()
+                ForEach(game.attempts.indices.reversed(),
+                        id: \.self) { index in
+                    view(for: game.attempts[index])
+                }
+            }
+        
+            PegChooser(choices: pegChoices, missing: missing) { peg in
+                game.setGuessPeg(peg, at: selection)
+                selection = (selection + 1) % game.masterCode.pegs.count
+            }
         }
         .padding()
         .onAppear {
@@ -40,12 +45,11 @@ struct CodeView<T: Hashable>: View {
         }
     }
     
-    
-    
     var guessButton: some View {
         Button("Guess") {
             withAnimation {
                 game.attemptGuess()
+                selection = 0
             }
         }
         .font(.system(size: GuessButton.maximumFontSize))
@@ -60,6 +64,10 @@ struct CodeView<T: Hashable>: View {
                     .background(
                         selectionBackground(index: index, codeKind: code.kind)
                     )
+                    .overlay {
+                        Selection.shape
+                            .foregroundStyle(code.isHidden ? .gray : .clear)
+                    }
                     .onTapGesture {
                         if code.kind == .guess {
                             selection = index

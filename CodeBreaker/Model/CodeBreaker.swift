@@ -16,7 +16,7 @@ struct CodeBreaker<T: Hashable> {
     let missingPeg: Peg<T>?
     
     init(pegChoices: [Peg<T>] = [.init(Color.red), .init(Color.green), .init(Color.blue), .init(Color.yellow)], missing: Peg<T> = .init(Color.clear), count: Int) {
-        self.masterCode = Code(kind: .master, missing: missing, count: count)
+        self.masterCode = Code(kind: .master(isHidden: true), missing: missing, count: count)
         self.guess = Code(kind: .guess, missing: missing, count: count)
         self.pegChoices = pegChoices
         self.masterCode.randomize(from: pegChoices)
@@ -29,6 +29,10 @@ struct CodeBreaker<T: Hashable> {
         self.guess = Code()
         self.pegChoices = []
         self.missingPeg = nil
+    }
+    
+    var isOver: Bool {
+        attempts.last?.pegs == masterCode.pegs
     }
     
     mutating func attemptGuess() {
@@ -48,6 +52,9 @@ struct CodeBreaker<T: Hashable> {
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
         guess.reset()
+        if isOver {
+            masterCode.kind = .master(isHidden: true)
+        }
     }
     
     mutating func setGuessPeg(_ peg: Peg<T>, at index: Int) {

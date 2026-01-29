@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
+    
     // MARK: - Constants
     let emojiPegs: [Peg<String>] = [
         .init("🐱"),

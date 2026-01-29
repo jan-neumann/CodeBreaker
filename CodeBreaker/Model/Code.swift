@@ -11,7 +11,7 @@ import SwiftUI
 struct Code<T: Hashable> {
     
     enum Kind: Equatable {
-        case master
+        case master(isHidden: Bool)
         case guess
         case attempt([Match])
         case unknown
@@ -39,7 +39,7 @@ struct Code<T: Hashable> {
             pegs[index] = pegChoices.randomElement() ?? missing
         }
     }
-    
+     
     mutating func reset() {
         guard let missing = missing else { return }
         pegs = Array(repeating: missing, count: pegs.count)
@@ -51,6 +51,15 @@ struct Code<T: Hashable> {
             return matches
         default:
             return nil
+        }
+    }
+    
+    var isHidden: Bool {
+        switch kind {
+        case .master(let isHidden):
+            return isHidden
+        default:
+            return false
         }
     }
     
