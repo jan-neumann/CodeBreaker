@@ -18,12 +18,6 @@ struct PegView<T: Hashable> : View {
     
     var body: some View {
         pegShape
-            .overlay {
-                if peg == missing {
-                    pegShape
-                        .strokeBorder(Color.gray)
-                }
-            }
             .contentShape(pegShape)
             .aspectRatio(contentMode: .fit)
             .foregroundStyle(foregroundColor(for: peg.value))
