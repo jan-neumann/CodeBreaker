@@ -11,9 +11,19 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
     
     // MARK: - Data In
     let code: Code<T>
-    var selection: Int? = nil
+    @Binding var selection: Int
     @ViewBuilder let ancillaryView: () -> AncillaryView
     var onSelect: ((Int) -> Void)? = nil
+    
+    init(code: Code<T>,
+         selection: Binding<Int> = .constant(-1),
+         @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() },
+         onSelect: ((Int) -> Void)? = nil) {
+        self.code = code
+        self._selection = selection
+        self.ancillaryView = ancillaryView
+        self.onSelect = onSelect
+    }
     
     // MARK: - Body
     var body: some View {
@@ -46,7 +56,7 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
     
     @ViewBuilder
     func selectionBackground(index: Int, codeKind: Code<T>.Kind) -> some View {
-        if let selection = selection, selection == index, codeKind == .guess {
+        if selection == index, codeKind == .guess {
             Selection.shape
                 .foregroundStyle(Selection.color)
         } else {

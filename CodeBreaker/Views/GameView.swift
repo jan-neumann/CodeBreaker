@@ -20,10 +20,13 @@ struct GameView<T: Hashable>: View {
     // MARK: - Body
     var body: some View {
         VStack {
-            CodeView(code: game.masterCode) { Text("1:04").font(.title) }
+            CodeView(code: game.masterCode) {
+                Text("12:59").font(.title)
+                    .frame(minWidth: 100)
+            }
             
             if (!game.isOver) {
-                CodeView(code: game.guess, selection: selection,
+                CodeView(code: game.guess, selection: $selection,
                          ancillaryView: guessButton)  { index in
                     selection = index
                 }
@@ -33,10 +36,7 @@ struct GameView<T: Hashable>: View {
                 Divider()
                 ForEach(game.attempts.indices.reversed(),
                         id: \.self) { index in
-                    CodeView(code: game.attempts[index]) {
-                        if let matches = game.attempts[index].matches {
-                            MatchMarkers(matches: matches)
-                        }
+                    CodeView(code: game.attempts[index]) { matchMarkers(index: index)
                     }
                 }
             }
@@ -49,6 +49,15 @@ struct GameView<T: Hashable>: View {
         .padding()
         .onAppear {
             resetGame()
+        }
+    }
+    
+    @ViewBuilder
+    func matchMarkers(index: Int) -> some View {
+        if let matches = game.attempts[index].matches {
+            MatchMarkers(matches: matches)
+        } else {
+            EmptyView()
         }
     }
     
