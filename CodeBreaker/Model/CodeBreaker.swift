@@ -21,7 +21,6 @@ struct CodeBreaker<T: Hashable> {
         self.pegChoices = pegChoices
         self.masterCode.randomize(from: pegChoices)
         self.missingPeg = missing
-        print(masterCode)
     }
     
     init() {
@@ -33,6 +32,13 @@ struct CodeBreaker<T: Hashable> {
     
     var isOver: Bool {
         attempts.last?.pegs == masterCode.pegs
+    }
+    
+    mutating func restart() {
+        masterCode.kind = .master(isHidden: true)
+        masterCode.randomize(from: pegChoices)
+        guess.reset()
+        attempts.removeAll()
     }
     
     mutating func attemptGuess() {

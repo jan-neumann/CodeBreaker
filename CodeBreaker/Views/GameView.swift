@@ -21,8 +21,8 @@ struct GameView<T: Hashable>: View {
     var body: some View {
         VStack {
             CodeView(code: game.masterCode) {
-                Text("12:59").font(.title)
-                    .frame(minWidth: 100)
+                Text("12:59")
+
             }
             
             if (!game.isOver) {
@@ -41,10 +41,9 @@ struct GameView<T: Hashable>: View {
                 }
             }
             
-            PegChooser(choices: pegChoices, missing: missing) { peg in
-                game.setGuessPeg(peg, at: selection)
-                selection = (selection + 1) % game.masterCode.pegs.count
-            }
+            PegChooser(choices: pegChoices,
+                       missing: missing,
+                       onChoose: changePegAtSelection)
         }
         .padding()
         .onAppear {
@@ -63,9 +62,12 @@ struct GameView<T: Hashable>: View {
     
     func guessButton() -> some View {
         Button("Guess") {
-            withAnimation {
+            withAnimation(.guess) {
                 game.attemptGuess()
                 selection = 0
+                if game.isOver {
+                    game.masterCode.kind = .master(isHidden: false)
+                }
             }
         }
         .font(.system(size: GuessButton.maximumFontSize))
@@ -78,6 +80,11 @@ struct GameView<T: Hashable>: View {
             missing: missing,
             count: Int.random(in: 3...6)
         )
+    }
+    
+    func changePegAtSelection(to peg: Peg<T>) {
+        game.setGuessPeg(peg, at: selection)
+        selection = (selection + 1) % game.masterCode.pegs.count
     }
     
 }

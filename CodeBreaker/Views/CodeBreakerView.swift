@@ -37,8 +37,10 @@ struct CodeBreakerView: View {
     
     // MARK: - Body
     var body: some View {
-        
+       
         if !restartGame {
+            restartButton
+
             VStack {
                 if emojiView {
                     GameView<String>(
@@ -51,9 +53,8 @@ struct CodeBreakerView: View {
                         missing: colorMissing
                     )
                 }
-                
-                restartButton
             }
+            
         } else {
             ProgressView()
                 .scaleEffect(3)
@@ -62,17 +63,21 @@ struct CodeBreakerView: View {
     
     var restartButton: some View {
         Button("Restart") {
-            restartGame = true
-            emojiView = Bool.random()
+            withAnimation(.restart) {
+                restartGame = true
+                emojiView = Bool.random()
+            }
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation {
                     restartGame = false
                 }
             }
         }
-        .font(.largeTitle)
+        
     }
 }
+
 
 #Preview {
     CodeBreakerView()
