@@ -22,7 +22,6 @@ struct GameView<T: Hashable>: View {
         VStack {
             CodeView(code: game.masterCode) {
                 Text("12:59")
-
             }
             
             if (!game.isOver) {
@@ -30,6 +29,7 @@ struct GameView<T: Hashable>: View {
                          ancillaryView: guessButton)  { index in
                     selection = index
                 }
+                .animation(nil, value: game.attempts.count)
             }
             
             ScrollView {
@@ -38,12 +38,18 @@ struct GameView<T: Hashable>: View {
                         id: \.self) { index in
                     CodeView(code: game.attempts[index]) { matchMarkers(index: index)
                     }
+                    .transition(.attempt(game.isOver))
                 }
+                         
             }
             
-            PegChooser(choices: pegChoices,
-                       missing: missing,
-                       onChoose: changePegAtSelection)
+            if !game.isOver {
+                PegChooser(choices: pegChoices,
+                           missing: missing,
+                           onChoose: changePegAtSelection)
+                .transition(.pegChooser)
+            }
+         
         }
         .padding()
         .onAppear {
@@ -99,6 +105,16 @@ private struct GuessButton {
 extension Color {
     static func gray(_ brightness: CGFloat) -> Color {
         Color(hue: 148/360, saturation: 0, brightness: brightness)
+    }
+}
+
+extension AnyTransition {
+    static let pegChooser = AnyTransition.offset(x: 0, y: 200)
+    static func attempt(_ gameIsOver: Bool) -> AnyTransition {
+        AnyTransition.asymmetric(
+            insertion: gameIsOver ? .opacity : .move(edge: .top),
+            removal: .move(edge: .trailing)
+        )
     }
 }
 

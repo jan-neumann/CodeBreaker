@@ -33,15 +33,14 @@ struct CodeBreakerView: View {
     
     // MARK: - Data Owned by View
     @State private var emojiView: Bool = false
-    @State private var restartGame: Bool = false
     
     // MARK: - Body
     var body: some View {
-       
-        if !restartGame {
-            restartButton
 
-            VStack {
+        VStack {
+            restartButton
+            
+            Group {
                 if emojiView {
                     GameView<String>(
                         pegChoices: emojiPegs,
@@ -54,26 +53,15 @@ struct CodeBreakerView: View {
                     )
                 }
             }
-            
-        } else {
-            ProgressView()
-                .scaleEffect(3)
+        
         }
     }
     
     var restartButton: some View {
         Button("Restart") {
-            withAnimation(.restart) {
-                restartGame = true
-                emojiView = Bool.random()
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation {
-                    restartGame = false
-                }
-            }
+            emojiView.toggle()
         }
+        
         
     }
 }

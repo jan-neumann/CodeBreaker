@@ -38,7 +38,11 @@ struct Code<T: Hashable> {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? missing
         }
-        print(self)
+        print("")
+        for index in pegs.indices {
+            print(pegs[index].value)
+        }
+      
     }
      
     mutating func reset() {

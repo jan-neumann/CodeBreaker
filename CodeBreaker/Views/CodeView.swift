@@ -32,12 +32,17 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
                 if let missing = code.missing {
                     PegView(peg: code.pegs[index], missing: missing)
                         .padding(Selection.border)
-                        .background(
+                        .background( // selection background
                             selectionBackground(index: index, codeKind: code.kind)
                         )
-                        .overlay {
+                        .overlay { // hidden code obscuring
                             Selection.shape
                                 .foregroundStyle(code.isHidden ? .gray : .clear)
+                                .transaction { transaction in
+                                    if code.isHidden {
+                                        transaction.animation = nil
+                                    }
+                                }
                         }
                         .onTapGesture {
                             onSelect?(index)
