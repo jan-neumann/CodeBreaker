@@ -30,7 +30,7 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 if let missing = code.missing {
-                    PegView(peg: code.pegs[index], missing: missing)
+                    PegView(peg: code.pegs[index], missing: missing, isHidden: code.isHidden)
                         .padding(Selection.border)
                         .background( // selection background
                             selectionBackground(index: index, codeKind: code.kind)
@@ -71,7 +71,7 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
     
 }
 
-fileprivate struct Selection {
+struct Selection {
     static let border: CGFloat = 5
     static let cornerRadius: CGFloat = 10
     static let color: Color = .gray(0.85)

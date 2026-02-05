@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
+    @State private var restarting = false
+  
     // MARK: - Constants
     let emojiPegs: [Peg<String>] = [
         .init("🐱"),
@@ -40,28 +42,34 @@ struct CodeBreakerView: View {
         VStack {
             restartButton
             
-            Group {
-                if emojiView {
-                    GameView<String>(
-                        pegChoices: emojiPegs,
-                        missing: emojiMissing,
-                    )
-                } else {
-                    GameView<Color>(
-                        pegChoices: colorPegs,
-                        missing: colorMissing
-                    )
-                }
+            if emojiView {
+                GameView<String>(
+                    pegChoices: emojiPegs,
+                    missing: emojiMissing,
+                    restarting: $restarting,
+                )
+            } else {
+                GameView<Color>(
+                    pegChoices: colorPegs,
+                    missing: colorMissing,
+                    restarting: $restarting
+                )
             }
-        
         }
     }
     
     var restartButton: some View {
         Button("Restart") {
-            emojiView.toggle()
+            withAnimation(.restart) {
+                restarting = true
+                emojiView.toggle()
+            } completion: {
+                withAnimation(.restart) {
+                    restarting = false
+                }
+            }
+ 
         }
-        
         
     }
 }

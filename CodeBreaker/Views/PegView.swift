@@ -12,6 +12,7 @@ struct PegView<T: Hashable> : View {
     // MARK: - Data In
     let peg: Peg<T>
     let missing: Peg<T>
+    let isHidden: Bool
     
     // MARK: - Body
     let pegShape = Circle() //RoundedRectangle(cornerRadius: 10)
@@ -20,13 +21,13 @@ struct PegView<T: Hashable> : View {
         pegShape
             .contentShape(pegShape)
             .aspectRatio(contentMode: .fit)
-            .foregroundStyle(foregroundColor(for: peg.value))
-            .overlay(overlayText(for: peg.value))
+            .foregroundStyle(isHidden ? .clear : foregroundColor(for: peg.value))
+            .overlay(isHidden ? Text("") : overlayText(for: peg.value))
             .font(.system(size: 80))
             .minimumScaleFactor(0.1)
     }
     
-    func overlayText(for value: T) -> some View {
+    func overlayText(for value: T) -> Text {
        Text(value as? String ?? "")
     }
     
@@ -37,8 +38,8 @@ struct PegView<T: Hashable> : View {
 
 #Preview {
     VStack {
-        PegView<Color>(peg: .init(.red), missing: .init(.clear))
-        PegView<String>(peg: .init("🦁"), missing: .init(""))
+        PegView<Color>(peg: .init(.red), missing: .init(.clear), isHidden: false)
+        PegView<String>(peg: .init("🦁"), missing: .init(""), isHidden: false)
     }
     .padding()
 }

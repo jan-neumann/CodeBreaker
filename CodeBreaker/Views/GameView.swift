@@ -12,24 +12,35 @@ struct GameView<T: Hashable>: View {
     // MARK: - Data In
     let pegChoices: [Peg<T>]
     let missing: Peg<T>
+    @Binding var restarting: Bool
     
     // MARK: - Data owned by View
     @State private var game: CodeBreaker<T> = CodeBreaker<T>()
     @State private var selection: Int = 0
-    
+  
+     
     // MARK: - Body
     var body: some View {
         VStack {
-            CodeView(code: game.masterCode) {
-                Text("12:59")
+            
+            if !restarting {
+                CodeView(code: game.masterCode) {
+                    Text("12:59")
+                }
+                .animation(nil, value: restarting)
+                .transaction { transaction in
+                    transaction.animation = nil
+                }
             }
             
-            if (!game.isOver) {
+            if (!game.isOver || restarting) {
                 CodeView(code: game.guess, selection: $selection,
                          ancillaryView: guessButton)  { index in
                     selection = index
                 }
+                .opacity(restarting ? 0 : 1)
                 .animation(nil, value: game.attempts.count)
+               
             }
             
             ScrollView {
@@ -119,5 +130,5 @@ extension AnyTransition {
 }
 
 #Preview {
-    GameView<String>(pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")], missing: .init(" "))
+    GameView<String>(pegChoices: [.init("🐱"), .init("🐹"), .init("🐯"), .init("🐸")], missing: .init(" "), restarting: .constant(false))
 }

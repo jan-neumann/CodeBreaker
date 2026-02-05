@@ -24,7 +24,7 @@ struct PegChooser<T: Hashable>: View {
                 Button {
                     onChoose(peg)
                 } label: {
-                    PegView(peg: peg, missing: missing)
+                    PegView(peg: peg, missing: missing, isHidden: false)
                 }
             }
         }
