@@ -34,8 +34,9 @@ struct GameView<T: Hashable>: View {
             }
             
             if (!game.isOver || restarting) {
-                CodeView(code: game.guess, selection: $selection,
-                         ancillaryView: guessButton)  { index in
+                CodeView(code: game.guess,
+                         selection: $selection,
+                         ancillaryView: { Button("Guess", action:  guess).flexibleSystemFont() })  { index in
                     selection = index
                 }
                 .opacity(restarting ? 0 : 1)
@@ -77,18 +78,14 @@ struct GameView<T: Hashable>: View {
         }
     }
     
-    func guessButton() -> some View {
-        Button("Guess") {
-            withAnimation(.guess) {
-                game.attemptGuess()
-                selection = 0
-                if game.isOver {
-                    game.masterCode.kind = .master(isHidden: false)
-                }
+    func guess() {
+        withAnimation(.guess) {
+            game.attemptGuess()
+            selection = 0
+            if game.isOver {
+                game.masterCode.kind = .master(isHidden: false)
             }
         }
-        .font(.system(size: GuessButton.maximumFontSize))
-        .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
     func resetGame() {
@@ -104,29 +101,6 @@ struct GameView<T: Hashable>: View {
         selection = (selection + 1) % game.masterCode.pegs.count
     }
     
-}
-
-private struct GuessButton {
-    static let minimumFontSize: CGFloat = 8
-    static let maximumFontSize: CGFloat = 80
-    static let scaleFactor = minimumFontSize / maximumFontSize
-}
-
-
-extension Color {
-    static func gray(_ brightness: CGFloat) -> Color {
-        Color(hue: 148/360, saturation: 0, brightness: brightness)
-    }
-}
-
-extension AnyTransition {
-    static let pegChooser = AnyTransition.offset(x: 0, y: 200)
-    static func attempt(_ gameIsOver: Bool) -> AnyTransition {
-        AnyTransition.asymmetric(
-            insertion: gameIsOver ? .opacity : .move(edge: .top),
-            removal: .move(edge: .trailing)
-        )
-    }
 }
 
 #Preview {

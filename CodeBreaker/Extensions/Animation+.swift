@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension Animation {
-    static let restart = Animation.spring(.bouncy, blendDuration: 3)
-    static let guess = Animation.easeInOut(duration: 3)
+    static let restart = Animation.spring(.bouncy, blendDuration: 0.5)
+    static let guess = Animation.easeInOut(duration: 0.5)
+    static let selection = Animation.easeInOut(duration: 0.5)
 }

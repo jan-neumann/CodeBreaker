@@ -15,6 +15,9 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
     @ViewBuilder let ancillaryView: () -> AncillaryView
     var onSelect: ((Int) -> Void)? = nil
     
+    // MARK: - Data owned by View
+    @Namespace private var selectionNamespace
+    
     init(code: Code<T>,
          selection: Binding<Int> = .constant(-1),
          @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() },
@@ -34,6 +37,8 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
                         .padding(Selection.border)
                         .background( // selection background
                             selectionBackground(index: index, codeKind: code.kind)
+                                .animation(.selection, value: selection)
+                             //   .matchedGeometryEffect(id: "selection", in: selectionNamespace)
                         )
                         .overlay { // hidden code obscuring
                             Selection.shape
@@ -61,11 +66,11 @@ struct CodeView<T: Hashable, AncillaryView: View>: View {
     
     @ViewBuilder
     func selectionBackground(index: Int, codeKind: Code<T>.Kind) -> some View {
-        if selection == index, codeKind == .guess {
-            Selection.shape
-                .foregroundStyle(Selection.color)
-        } else {
-            EmptyView()
+        Group {
+            if selection == index, codeKind == .guess {
+                Selection.shape
+                    .foregroundStyle(Selection.color)
+            } 
         }
     }
     

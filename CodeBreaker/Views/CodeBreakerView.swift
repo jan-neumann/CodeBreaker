@@ -40,7 +40,9 @@ struct CodeBreakerView: View {
     var body: some View {
 
         VStack {
-            restartButton
+            Button("Restart",
+                   systemImage: "arrow.circlepath",
+                   action: restart)
             
             if emojiView {
                 GameView<String>(
@@ -58,19 +60,15 @@ struct CodeBreakerView: View {
         }
     }
     
-    var restartButton: some View {
-        Button("Restart") {
+    func restart() {
+        withAnimation(.restart) {
+            restarting = true
+            emojiView.toggle()
+        } completion: {
             withAnimation(.restart) {
-                restarting = true
-                emojiView.toggle()
-            } completion: {
-                withAnimation(.restart) {
-                    restarting = false
-                }
+                restarting = false
             }
- 
         }
-        
     }
 }
 
